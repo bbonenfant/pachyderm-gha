@@ -5,12 +5,8 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      PACHYDERM_CLUSTER_URL: grpcs://hub-c0-fl3rezqasn.clusters.pachyderm.io:31400
-      PACHYDERM_TOKEN: ${{ secrets.PACHYDERM_TOKEN }}
-      DOCKER_IMAGE_NAME: pachyderm/housing-prices
-      PACHYDERM_PIPELINE_FILES: regression.json
     steps:
+      - uses: actions/checkout@v2
       - name: pachyderm-update-pipelines
         uses: ./pachyderm-github-action
         id: pup
