@@ -33,7 +33,7 @@ runs:
         echo ${{ inputs.pipeline-configs }}
         for config in ${{ inputs.pipeline-configs }}
         do
-          run.py $config
+          ./run.py $config
         done
       shell: bash
       env:
