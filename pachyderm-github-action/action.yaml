@@ -31,9 +31,10 @@ runs:
     - name: 'update pipelines'
       run: |
         echo ${{ inputs.pipeline-configs }}
+        echo
         for config in ${{ inputs.pipeline-configs }}
         do
-          ./run.py $config
+          ${GITHUB_ACTION_PATH}/run.py $config
         done
       shell: bash
       env:
