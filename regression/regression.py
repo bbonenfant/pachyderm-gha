@@ -48,7 +48,7 @@ def create_corr_matrix(data):
     corr = data.corr()
     
     # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(corr, dtype=np.bool))
+    mask = np.triu(np.ones_like(corr, dtype=bool))
 
     # Generate a custom diverging colormap
     cmap = sns.diverging_palette(220, 10, as_cmap=True)

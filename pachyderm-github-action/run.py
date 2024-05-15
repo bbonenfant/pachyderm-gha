@@ -42,7 +42,7 @@ def parse_config(config_file: Path) -> Config:
     return Config(
         pipeline_spec=Path(parsed["pipeline_spec"]),
         dockerfile=Path(parsed["dockerfile"]),
-        docker_context=Path(parsed["build_dir"]),
+        docker_context=config_file.parent.joinpath(Path(parsed["build_dir"])),
         image_name=parsed["image_name"],
     )
 
