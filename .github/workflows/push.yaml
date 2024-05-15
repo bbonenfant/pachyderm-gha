@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: pachyderm-update-pipelines
-        uses: ./pachyderm-github-action
+        uses: bonenfan5ben/pachyderm-gha/pachyderm-github-action@hackathon-2024
         id: pup
         with:
           pipeline-configs: |
