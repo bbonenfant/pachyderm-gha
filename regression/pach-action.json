@@ -1,0 +1,6 @@
+{
+  "pipeline_spec": "regression.json",
+  "dockerfile": "Dockerfile",
+  "build_dir": ".",
+  "image_name": "bonenfan5ben/regression"
+}

@@ -1,6 +1,43 @@
 # action.yml
 name: 'Pachyderm Pipeline Updater'
 description: 'This uses the Pachyderm standard pachctl docker image to update a pipeline'
+
+inputs:
+  pipeline-configs:
+    description: 'new-line separated list of config file locations.'
+    required: true
+  dockerhub-token:
+    description: 'the auth token used to push images'
+    required: true
+  dockerhub-username:
+    description: 'the username of dockerhub account'
+    required: true
+  pachyderm-cluster-url:
+    description: 'pachyderm url'
+    required: true
+#  pachyderm-token:
+#    description: 'pachyderm auth token'
+#    required: true
+
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - name: 'install pachyderm-sdk'
+      run: python3 -m pip install pachyderm-sdk
+      shell: bash
+    - name: 'update pipelines'
+      run: |
+        echo ${{ inputs.pipeline-configs }}
+        for config in ${{ inputs.pipeline-configs }}
+        do
+          run.py $config
+        done
+      shell: bash
+      env:
+        DOCKERHUB_TOKEN: ${{ inputs.dockerhub-token }}
+        DOCKERHUB_USERNAME: ${{ inputs.dockerhub-username }}
+        PACHYDERM_CLUSTER_URL: ${{ inputs.pachyderm-cluster-url }}
+#        PACHYDERM_TOKEN: ${{ inputs.pachyderm-token }}
