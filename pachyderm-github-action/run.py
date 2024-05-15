@@ -18,7 +18,9 @@ def main(config_file: Path):
     config = parse_config(config_file)
 
     diff = git_diff()
+    print(f"> git diff: {diff}")
     build_context = config.docker_context.resolve()
+    print(f"> build context: {build_context}")
     for file in diff:
         if file.is_relative_to(build_context):
             break
@@ -51,6 +53,7 @@ def git_diff() -> list[Path]:
 
 
 def build_image(image_name: str, dockerfile: Path, docker_context: Path) -> None:
+    print(f" > building: {image_name}")
     run(f"docker build --tag {image_name} --file {dockerfile.resolve()} {docker_context}".split(), check=True)
 
 
@@ -58,6 +61,7 @@ def push_image(image_name: str) -> None:
     username = environ.get("DOCKERHUB_USERNAME")
     token = environ.get("DOCKERHUB_TOKEN")
     run(f"docker login --username {username} --password {token}".split(), check=True)
+    print(f" > pushing: {image_name}")
     run(f"docker push {image_name}".split(), check=True)
 
 
@@ -70,7 +74,7 @@ def update_pipeline(pipeline_spec: Path, image_name: str) -> None:
 
     client = Client.from_pachd_address(environ.get("PACHYDERM_CLUSTER_URL"))
     client.pps.create_pipeline_v2(
-        create_pipeline_request_json=json.loads(parsed),
+        create_pipeline_request_json=json.dumps(parsed),
         update=True,
     )
 
