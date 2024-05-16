@@ -32,11 +32,11 @@ runs:
       run: |
         echo "${{ inputs.pipeline-configs }}"
         
-        for config in "${{ inputs.pipeline-configs }}"
+        while IFS= read -r config 
         do
           echo $config
           ${GITHUB_ACTION_PATH}/run.py $config
-        done
+        done <<< "${{ inputs.pipeline-configs }}"
       shell: bash
       env:
         DOCKERHUB_TOKEN: ${{ inputs.dockerhub-token }}
