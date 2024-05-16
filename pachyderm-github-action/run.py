@@ -53,14 +53,14 @@ def parse_config(config_file: Path) -> Config:
 
 def check_pipeline_exists(pipeline_spec: Path) -> bool:
     from pachyderm_sdk import Client
-    from pachyderm_sdk.api import pps
+    from pachyderm_sdk.api import pps, pfs
 
     parsed = json.loads(pipeline_spec.read_bytes())
     project = parsed["pipeline"].get("project")
     if project is not None:
         project = project.get("name", "default")
     name = parsed["pipeline"].get("name")
-    pipeline = pps.Pipeline.from_uri(f"{project}/{name}")
+    pipeline = pps.Pipeline(name=name, project=pfs.Project(name=project))
 
     client = Client.from_pachd_address(environ.get("PACHYDERM_CLUSTER_URL"))
     return client.pps.pipeline_exists(pipeline)
