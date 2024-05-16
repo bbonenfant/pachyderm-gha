@@ -19,14 +19,15 @@ def main(config_file: Path):
 
     diff = git_diff()
     print(f"> git diff: {diff}")
-    build_context = config.docker_context.resolve()
+    build_context = list_docker_context(config.docker_context.resolve())
     print(f"> build context: {build_context}")
     for file in diff:
-        if file.is_relative_to(build_context):
+        if file in build_context:
             break
     else:
         print(f"No changes detected to the files within the docker build context: {config.docker_context}")
         print("Exiting without updating pipeline")
+        exit(0)
 
     sha = environ.get("GITHUB_SHA")
     tagged_image = f"{config.image_name}:{sha}"
@@ -49,6 +50,11 @@ def parse_config(config_file: Path) -> Config:
 
 def git_diff() -> list[Path]:
     process = run("git diff --name-only HEAD^..HEAD".split(' '), capture_output=True)
+    return [Path(file).resolve() for file in process.stdout.decode().splitlines()]
+
+
+def list_docker_context(build_dir: Path) -> list[Path]:
+    process = run(f"rsync -avn {build_dir} /dev/shm --exclude-from .dockerignore", capture_output=True)
     return [Path(file).resolve() for file in process.stdout.decode().splitlines()]
 
 
