@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -u
+#!/usr/bin/env -S python3 -u
 import json
 import sys
 from os import environ
