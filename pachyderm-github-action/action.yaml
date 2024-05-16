@@ -32,7 +32,7 @@ runs:
       run: |
         echo "${{ inputs.pipeline-configs }}"
         
-        for config in ${{ inputs.pipeline-configs }}
+        for config in "${{ inputs.pipeline-configs }}"
         do
           echo $config
           ${GITHUB_ACTION_PATH}/run.py $config
