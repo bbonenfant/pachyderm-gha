@@ -58,7 +58,7 @@ def list_docker_context(build_dir: Path) -> list[Path]:
     if (docker_ignore := build_dir / ".dockerignore").exists():
         command += f" --exclude-from {docker_ignore}"
     process = run(command.split(' '), capture_output=True)
-    return [Path(file).resolve() for file in process.stdout.decode().splitlines()]
+    return [Path(file).resolve() for file in process.stdout.decode().splitlines() if file.startswith(str(build_dir))]
 
 
 def build_image(image_name: str, dockerfile: Path, docker_context: Path) -> None:
