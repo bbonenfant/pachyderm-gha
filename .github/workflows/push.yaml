@@ -11,7 +11,7 @@ jobs:
         uses: ./pachyderm-github-action
         id: pup
         with:
-          pipeline-configs: |
+          pipeline-configs: |-
             regression/pach-action.json
             opencv/pach-action.json
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
