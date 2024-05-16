@@ -54,7 +54,7 @@ def git_diff() -> list[Path]:
 
 
 def list_docker_context(build_dir: Path) -> list[Path]:
-    process = run(f"rsync -avn {build_dir} /dev/shm --exclude-from .dockerignore", capture_output=True)
+    process = run(f"rsync -avn {build_dir} /dev/shm --exclude-from .dockerignore".split(' '), capture_output=True)
     return [Path(file).resolve() for file in process.stdout.decode().splitlines()]
 
 
