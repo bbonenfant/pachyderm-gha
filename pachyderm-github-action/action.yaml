@@ -30,7 +30,7 @@ runs:
       shell: bash
     - name: 'update pipelines'
       run: |
-        echo ${{ inputs.pipeline-configs }}
+        echo "${{ inputs.pipeline-configs }}"
         echo
         for config in ${{ inputs.pipeline-configs }}
         do
