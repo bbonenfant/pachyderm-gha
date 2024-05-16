@@ -14,5 +14,6 @@ def make_edges(image):
 
 # walk /pfs/images and call make_edges on every file found
 for dirpath, dirs, files in os.walk("/pfs/images"):
+
     for file in files:
         make_edges(os.path.join(dirpath, file))
