@@ -45,8 +45,8 @@ def main(config_file: Path):
 def parse_config(config_file: Path) -> Config:
     parsed = json.loads(config_file.read_bytes())
     return Config(
-        pipeline_spec=Path(parsed["pipeline_spec"]),
-        dockerfile=Path(parsed["dockerfile"]),
+        pipeline_spec=config_file.parent.joinpath(Path(parsed["pipeline_spec"])),
+        dockerfile=config_file.parent.joinpath(Path(parsed["dockerfile"])),
         docker_context=config_file.parent.joinpath(Path(parsed["build_dir"])),
         image_name=parsed["image_name"],
     )
