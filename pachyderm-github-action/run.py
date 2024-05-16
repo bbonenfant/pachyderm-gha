@@ -16,9 +16,19 @@ class Config(NamedTuple):
 
 def main(config_file: Path):
     config = parse_config(config_file)
+    sha = environ.get("GITHUB_SHA")
+    tagged_image = f"{config.image_name}:{sha}"
+
+    if not check_pipeline_exists(config.pipeline_spec):
+        build_and_update(config, tagged_image)
+        exit(0)
 
     diff = git_diff()
     print(f"> git diff: {diff}")
+    if config.pipeline_spec.resolve() in diff:
+        build_and_update(config, tagged_image)
+        exit(0)
+
     build_context = list_docker_context(config.docker_context.resolve())
     print(f"> build context: {build_context}")
     for file in diff:
@@ -29,13 +39,7 @@ def main(config_file: Path):
         print("Exiting without updating pipeline")
         exit(0)
 
-    sha = environ.get("GITHUB_SHA")
-    tagged_image = f"{config.image_name}:{sha}"
-
-    build_image(tagged_image, config.dockerfile, config.docker_context)
-    push_image(tagged_image)
-
-    update_pipeline(config.pipeline_spec, tagged_image)
+    build_and_update(config, tagged_image)
 
 
 def parse_config(config_file: Path) -> Config:
@@ -46,6 +50,20 @@ def parse_config(config_file: Path) -> Config:
         docker_context=config_file.parent.joinpath(Path(parsed["build_dir"])),
         image_name=parsed["image_name"],
     )
+
+def check_pipeline_exists(pipeline_spec: Path) -> bool:
+    from pachyderm_sdk import Client
+    from pachyderm_sdk.api import pps
+
+    parsed = json.loads(pipeline_spec.read_bytes())
+    project = parsed["pipeline"].get("project")
+    if project is not None:
+        project = project.get("name", "default")
+    name = parsed["pipeline"].get("name")
+    pipeline = pps.Pipeline.from_uri(f"{project}/{name}")
+
+    client = Client.from_pachd_address(environ.get("PACHYDERM_CLUSTER_URL"))
+    return client.pps.pipeline_exists(pipeline)
 
 
 def git_diff() -> list[Path]:
@@ -86,6 +104,12 @@ def update_pipeline(pipeline_spec: Path, image_name: str) -> None:
         create_pipeline_request_json=json.dumps(parsed),
         update=True,
     )
+
+
+def build_and_update(config: Config, tagged_image: str) -> None:
+    build_image(tagged_image, config.dockerfile, config.docker_context)
+    push_image(tagged_image)
+    update_pipeline(config.pipeline_spec, tagged_image)
 
 
 if __name__ == "__main__":
